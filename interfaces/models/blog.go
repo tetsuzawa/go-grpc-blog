@@ -89,27 +89,18 @@ func (u *BlogServicer) Update(ctx context.Context, req *blogpb.UpdateBlogReq) (*
 
 	blog := req.GetBlog()
 
-	fmt.Println(blog.Id)
 	oID, err := primitive.ObjectIDFromHex(blog.Id)
 	if err != nil {
 		log.Printf("failed to decode id at ObjectIdFromHex: %v\n", err)
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
 	}
 	filter := bson.M{"_id": oID}
-	//b := blogpb.Blog{
-	//	AutherId: blog.AutherId,
-	//	Title:    blog.Title,
-	//	Content:  blog.Content,
-	//}
-	//if err != nil {
-	//	log.Printf("failed to encode at bson.Marshal(): %v\n", err)
-	//	return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
-	//}
-	update := bson.M{"$set": bson.M{
-		"author_id": blog.AutherId,
-		"title":     blog.Title,
-		"content":   blog.Content,
-	}}
+	b := blogpb.Blog{
+		AutherId: blog.AutherId,
+		Title:    blog.Title,
+		Content:  blog.Content,
+	}
+	update := bson.M{"$set": b}
 
 	_, err = BlogCollection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
@@ -121,7 +112,6 @@ func (u *BlogServicer) Update(ctx context.Context, req *blogpb.UpdateBlogReq) (*
 		log.Printf("failed to find document at FindOne: %v\n", err)
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
 	}
-	//TODO DEBUG result
 
 	return &blogpb.UpdateBlogRes{Blog: blog}, nil
 }
@@ -131,7 +121,12 @@ func (u *BlogServicer) Delete(ctx context.Context, req *blogpb.DeleteBlogReq) (*
 
 	id := req.GetId()
 
-	filter := bson.D{{"_id", id}}
+	oID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Printf("failed to decode id at ObjectIdFromHex: %v\n", err)
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
+	}
+	filter := bson.M{"_id": oID}
 
 	result, err := BlogCollection.DeleteOne(context.TODO(), filter)
 	if err != nil {
