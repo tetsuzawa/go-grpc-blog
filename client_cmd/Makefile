@@ -1,3 +1,5 @@
+BIN_NAME="blog_client"
+
 .PHONY: build
 build:
 	go build -o bin/$(BIN_NAME) .
