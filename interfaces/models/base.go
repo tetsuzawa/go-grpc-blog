@@ -44,6 +44,7 @@ func init() {
 		//config.Cfg.DB.ETC,
 	)
 
+	log.Println("Connecting to MongoDB...")
 	clientOptions := options.Client().ApplyURI(dbName)
 	client, err = mongo.NewClient(clientOptions)
 	if err != nil {
@@ -62,4 +63,13 @@ func init() {
 	}
 
 	db = client.Database(config.Cfg.DB.Name)
+	log.Println("Successfully connected to MongoDB!")
+}
+
+func Disconnect() error {
+	err := client.Disconnect(context.TODO())
+	if err != nil {
+		return errors.Wrap(err, "failed to disconnect from DB at Disconnect()")
+	}
+	return nil
 }
