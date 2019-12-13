@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+	log.Println("Starting server...")
 	listenPort, err := net.Listen("tcp", ":31060")
 	if err != nil {
 		log.Fatalln(err)
@@ -37,12 +38,12 @@ func main() {
 
 	<-c
 
-	log.Printf("\n\nStopping the server...\n")
+	log.Println("Stopping the server...")
 	server.Stop()
-	log.Printf("\n\nClosing MongoDB connection...\n")
+	log.Printf("Closing MongoDB connection...")
 	err = models.Disconnect()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Printf("\nDone.\n\n")
+	log.Printf("Done.")
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/tetsuzawa/go-3daudio/web-app/config"
 	"log"
 	"os"
 	"time"
@@ -12,6 +11,8 @@ import (
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/tetsuzawa/go-grpc-blog/config"
 )
 
 const (
@@ -25,10 +26,13 @@ func GetTableName(name string) string {
 	return fmt.Sprintf("%s", name)
 }
 
+var ctxMongo context.Context
 var client *mongo.Client
 var db *mongo.Database
 
 func init() {
+	log.Println("Connecting to MongoDB...")
+
 	var err error
 	err = godotenv.Load() //Load env.file
 	if err != nil {
@@ -51,13 +55,13 @@ func init() {
 		log.Fatalln(errors.Wrap(err, "failed to make a instance of client at mongo.NewClient()"))
 	}
 
-	ctx, _ := context.WithTimeout(context.TODO(), 10*time.Second)
-	err = client.Connect(ctx)
+	ctxMongo, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	err = client.Connect(ctxMongo)
 	if err != nil {
 		log.Fatalln(errors.Wrap(err, "failed to connect to DB at mongo.NewClient()"))
 	}
 	// Check the connection
-	err = client.Ping(context.TODO(), nil)
+	err = client.Ping(ctxMongo, nil)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "failed to connect to DB at mongo.NewClient()"))
 	}
@@ -67,9 +71,10 @@ func init() {
 }
 
 func Disconnect() error {
-	err := client.Disconnect(context.TODO())
+	err := client.Disconnect(ctxMongo)
 	if err != nil {
 		return errors.Wrap(err, "failed to disconnect from DB at Disconnect()")
 	}
 	return nil
 }
+
