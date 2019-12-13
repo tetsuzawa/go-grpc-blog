@@ -13,6 +13,8 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	log.Println("Starting server...")
 	listenPort, err := net.Listen("tcp", ":31060")
 	if err != nil {
