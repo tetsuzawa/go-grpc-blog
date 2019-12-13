@@ -67,7 +67,6 @@ var createCmd = &cobra.Command{
 		check(err)
 		fmt.Printf("reqest=%v\n", req)
 		fmt.Printf("response=%v\n", res)
-
 	},
 }
 
