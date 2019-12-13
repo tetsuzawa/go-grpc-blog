@@ -18,12 +18,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	blogpb "github.com/tetsuzawa/go-grpc-blog/protocols/blog"
-	"google.golang.org/grpc"
 	"log"
 	"time"
 
 	"github.com/spf13/cobra"
+	"google.golang.org/grpc"
+
+	blogpb "github.com/tetsuzawa/go-grpc-blog/protocols/blog"
 )
 
 // createCmd represents the create command
@@ -61,11 +62,11 @@ var createCmd = &cobra.Command{
 		}
 		defer conn.Close()
 
-		blogClient = blogpb.NewBlogDataClient(conn)
+		blogClient := blogpb.NewBlogDataClient(conn)
 		res, err := blogClient.Create(ctx, req)
 		check(err)
-		fmt.Printf("reqest=%v\n",req)
-		fmt.Printf("response=%v\n",res)
+		fmt.Printf("reqest=%v\n", req)
+		fmt.Printf("response=%v\n", res)
 
 	},
 }

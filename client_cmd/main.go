@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "blog/cmd"
+import "github.com/tetsuzawa/go-grpc-blog/client_cmd/cmd"
 
 func main() {
   cmd.Execute()
