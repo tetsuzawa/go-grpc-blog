@@ -40,13 +40,13 @@ func (u *BlogServicer) TableName() string {
 func (u *BlogServicer) Create(ctx context.Context, req *blogpb.CreateBlogReq) (*blogpb.CreateBlogRes, error) {
 	BlogCollection := db.Collection(u.TableName())
 
-	Blog := req.GetBlog()
+	blog := req.GetBlog()
 
 	data := blogpb.Blog{
-		//ID:        Blog.Id,  //empty, Mongodb generates a unique object ID
-		AutherId: Blog.GetAutherId(),
-		Title:    Blog.GetTitle(),
-		Content:  Blog.GetContent(),
+		//ID:        blog.Id,  //empty, Mongodb generates a unique object ID
+		AutherId: blog.GetAutherId(),
+		Title:    blog.GetTitle(),
+		Content:  blog.GetContent(),
 	}
 
 	result, err := BlogCollection.InsertOne(context.TODO(), data)
@@ -56,11 +56,11 @@ func (u *BlogServicer) Create(ctx context.Context, req *blogpb.CreateBlogReq) (*
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
 	}
 
-	// add the id to Blog, first cast the "generic type" (go doesn't have real generics yet) to an Object ID.
+	// add the id to blog, first cast the "generic type" (go doesn't have real generics yet) to an Object ID.
 	old := result.InsertedID.(primitive.ObjectID)
 	//	// Convert the object id to it's string counterpart
-	Blog.Id = old.Hex()
-	return &blogpb.CreateBlogRes{Blog: Blog}, nil
+	blog.Id = old.Hex()
+	return &blogpb.CreateBlogRes{Blog: blog}, nil
 }
 
 func (u *BlogServicer) Read(ctx context.Context, req *blogpb.ReadBlogReq) (*blogpb.ReadBlogRes, error) {
@@ -68,37 +68,52 @@ func (u *BlogServicer) Read(ctx context.Context, req *blogpb.ReadBlogReq) (*blog
 
 	id := req.GetId()
 
-	filter := bson.D{{"_id", id}}
-
-	var Blog *blogpb.Blog
-	err := BlogCollection.FindOne(context.TODO(), filter).Decode(Blog)
+	oID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		log.Printf("failed to insert document at FindOne: %v\n", err)
+		log.Printf("failed to decode id at ObjectIdFromHex: %v\n", err)
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
 	}
-	return &blogpb.ReadBlogRes{Blog: Blog,}, nil
+	filter := bson.M{"_id": oID}
+
+	var blog = new(blogpb.Blog)
+	err = BlogCollection.FindOne(context.TODO(), filter).Decode(blog)
+	if err != nil {
+		log.Printf("failed to find document at FindOne: %v\n", err)
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
+	}
+	return &blogpb.ReadBlogRes{Blog: blog,}, nil
 }
 
 func (u *BlogServicer) Update(ctx context.Context, req *blogpb.UpdateBlogReq) (*blogpb.UpdateBlogRes, error) {
 	BlogCollection := db.Collection(u.TableName())
 
-	Blog := req.GetBlog()
+	blog := req.GetBlog()
 
-	filter := bson.D{{"_id", Blog.Id}}
+	oID, err := primitive.ObjectIDFromHex(blog.Id)
+	if err != nil {
+		log.Printf("failed to decode id at ObjectIdFromHex: %v\n", err)
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
+	}
+	filter := bson.M{"_id": oID}
+	b := blogpb.Blog{
+		AutherId: blog.AutherId,
+		Title:    blog.Title,
+		Content:  blog.Content,
+	}
+	update := bson.M{"$set": b}
 
-	_, err := BlogCollection.UpdateOne(context.TODO(), filter, Blog)
+	_, err = BlogCollection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		log.Printf("failed to update document at UpdateOne: %v\n", err)
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
 	}
-	err = BlogCollection.FindOne(context.TODO(), filter).Decode(Blog)
+	err = BlogCollection.FindOne(context.TODO(), filter).Decode(blog)
 	if err != nil {
-		log.Printf("failed to insert document at FindOne: %v\n", err)
+		log.Printf("failed to find document at FindOne: %v\n", err)
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
 	}
-	//TODO DEBUG result
 
-	return &blogpb.UpdateBlogRes{Blog: Blog}, nil
+	return &blogpb.UpdateBlogRes{Blog: blog}, nil
 }
 
 func (u *BlogServicer) Delete(ctx context.Context, req *blogpb.DeleteBlogReq) (*blogpb.DeleteBlogRes, error) {
@@ -106,7 +121,12 @@ func (u *BlogServicer) Delete(ctx context.Context, req *blogpb.DeleteBlogReq) (*
 
 	id := req.GetId()
 
-	filter := bson.D{{"_id", id}}
+	oID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Printf("failed to decode id at ObjectIdFromHex: %v\n", err)
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
+	}
+	filter := bson.M{"_id": oID}
 
 	result, err := BlogCollection.DeleteOne(context.TODO(), filter)
 	if err != nil {

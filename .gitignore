@@ -16,3 +16,6 @@
 # Useless
 .idea/
 .DS_store
+
+bin/
+build/
