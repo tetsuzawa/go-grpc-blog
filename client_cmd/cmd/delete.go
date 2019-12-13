@@ -18,12 +18,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	blogpb "github.com/tetsuzawa/go-grpc-blog/protocols/blog"
-	"google.golang.org/grpc"
 	"log"
 	"time"
 
 	"github.com/spf13/cobra"
+	"google.golang.org/grpc"
+
+	blogpb "github.com/tetsuzawa/go-grpc-blog/protocols/blog"
 )
 
 // deleteCmd represents the delete command
