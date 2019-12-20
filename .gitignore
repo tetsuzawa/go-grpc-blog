@@ -13,9 +13,14 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# env
+.env
+
 # Useless
 .idea/
 .DS_store
 
 bin/
 build/
+
+
