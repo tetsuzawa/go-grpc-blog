@@ -27,7 +27,7 @@ type BlogServicer struct{}
 func NewBlog(id, authorId, title, content string) *blogpb.Blog {
 	return &blogpb.Blog{
 		Id:       id,
-		AutherId: authorId,
+		AuthorId: authorId,
 		Title:    title,
 		Content:  content,
 	}
