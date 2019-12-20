@@ -3,14 +3,12 @@ package models
 import (
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
-	"log"
-	"os"
-	"time"
-
 	"github.com/joho/godotenv"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"os"
 
 	"github.com/tetsuzawa/go-grpc-blog/config"
 )
@@ -55,7 +53,8 @@ func init() {
 		log.Fatalln(errors.Wrap(err, "failed to make a instance of client at mongo.NewClient()"))
 	}
 
-	ctxMongo, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	//ctxMongo, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	ctxMongo = context.Background()
 	err = client.Connect(ctxMongo)
 	if err != nil {
 		log.Fatalln(errors.Wrap(err, "failed to connect to DB at mongo.NewClient()"))

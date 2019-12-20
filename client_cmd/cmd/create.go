@@ -45,7 +45,7 @@ var createCmd = &cobra.Command{
 
 		blog := &blogpb.Blog{
 			Id:       id,
-			AutherId: author_id,
+			AuthorId: author_id,
 			Title:    title,
 			Content:  content,
 		}
