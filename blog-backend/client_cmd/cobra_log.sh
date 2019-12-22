@@ -3,3 +3,4 @@ cobra add create
 cobra add update
 cobra add read
 cobra add delete
+cobra add list

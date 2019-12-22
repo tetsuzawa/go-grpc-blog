@@ -16,7 +16,8 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	log.Println("Starting server...")
-	listenPort, err := net.Listen("tcp", ":31060")
+	address := "0.0.0.0:31090"
+	listenPort, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -31,7 +32,7 @@ func main() {
 			log.Fatalln(err)
 		}
 	}()
-	log.Println("Server successfully started on port :31060")
+	log.Println("Server successfully started on port:", address)
 
 	// shutdown signal
 	c := make(chan os.Signal)

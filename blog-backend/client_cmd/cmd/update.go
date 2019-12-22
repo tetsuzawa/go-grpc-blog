@@ -27,13 +27,13 @@ import (
 	blogpb "github.com/tetsuzawa/go-grpc-blog/protocols/blog"
 )
 
-// createCmd represents the create command
-var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create blog",
-	Long:  `Create blog creates a blog content`,
+// updateCmd represents the update command
+var updateCmd = &cobra.Command{
+	Use:   "update",
+	Short: "Update blog",
+	Long:  `Update blog updates a blog content`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("create called")
+		fmt.Println("update called")
 		id, err := cmd.Flags().GetString("id")
 		check(err)
 		author_id, err := cmd.Flags().GetString("author_id")
@@ -45,12 +45,12 @@ var createCmd = &cobra.Command{
 
 		blog := &blogpb.Blog{
 			Id:       id,
-			AutherId: author_id,
+			AuthorId: author_id,
 			Title:    title,
 			Content:  content,
 		}
 
-		req := &blogpb.CreateBlogReq{
+		req := &blogpb.UpdateBlogReq{
 			Blog: blog,
 		}
 
@@ -63,7 +63,7 @@ var createCmd = &cobra.Command{
 		defer conn.Close()
 
 		blogClient := blogpb.NewBlogDataClient(conn)
-		res, err := blogClient.Create(ctx, req)
+		res, err := blogClient.Update(ctx, req)
 		check(err)
 		fmt.Printf("reqest=%v\n", req)
 		fmt.Printf("response=%v\n", res)
@@ -71,26 +71,30 @@ var createCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(createCmd)
+	rootCmd.AddCommand(updateCmd)
 
-	createCmd.Flags().StringP("id", "i", "ididid", "id option")
-	createCmd.Flags().StringP("author_id", "a", "authoridid", "author id option")
-	createCmd.Flags().StringP("title", "t", "Sample title", "title option")
-	createCmd.Flags().StringP("content", "c", "sample content content", "content option")
+	updateCmd.Flags().StringP("id", "i", "ididid", "id option")
+	updateCmd.Flags().StringP("author_id", "a", "authoridid", "author id option")
+	updateCmd.Flags().StringP("title", "t", "Sample title", "title option")
+	updateCmd.Flags().StringP("content", "c", "sample content content", "content option")
 
 	var err error
-	err = createCmd.MarkFlagRequired("id")
+	err = updateCmd.MarkFlagRequired("id")
 	check(err)
-	err = createCmd.MarkFlagRequired("author_id")
+	err = updateCmd.MarkFlagRequired("author_id")
 	check(err)
-	err = createCmd.MarkFlagRequired("title")
+	err = updateCmd.MarkFlagRequired("title")
 	check(err)
-	err = createCmd.MarkFlagRequired("content")
+	err = updateCmd.MarkFlagRequired("content")
 	check(err)
-}
 
-func check(err error) {
-	if err != nil {
-		panic(err)
-	}
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// updateCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// updateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
