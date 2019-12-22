@@ -21,6 +21,9 @@ services:
       - ./.env
     ports:
       - "27017:27017"
+    volumes:
+      - ./db/mongo/data:/data/db
+      - ./db/mongo/configdb:/data/configdb
     container_name: "db"
 
   client:
